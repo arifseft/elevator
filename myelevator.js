@@ -53,15 +53,36 @@ Elevator.prototype.decide = function() {
     var people = this.get_people();
     var person = people.length > 0 ? people[0] : undefined;
     
-    if(elevator) {
-        elevator.at_floor();
-        elevator.get_destination_floor();
-        elevator.get_position();
-    }
-    
     if(person) {
         person.get_floor();
-        return this.commit_decision(person.get_destination_floor());
+        var nearest = closestPeople(elevator.get_position(),people);
+        if(people.length > 8) {
+            if(numDirection(Elevator.DIRECTION_UP, people) >= numDirection(Elevator.DIRECTION_DOWN, people)) {
+                // yang mau naik banyak, jadi harus naik
+                if(nearest > elevator.get_position()) {
+                    return this.commit_decision(nearest);
+                }
+
+                if(person.get_destination_floor() > elevator.get_position()) {
+                    return this.commit_decision(person.get_destination_floor());
+                }
+            } else {
+                // yang mau turun banyak, jadi harus turun
+                if(nearest < elevator.get_position()) {
+                    return this.commit_decision(nearest);
+                }
+
+                if(person.get_destination_floor() < elevator.get_position()) {
+                    return this.commit_decision(person.get_destination_floor());
+                }
+            }
+        } else {
+            if(Math.abs(elevator.get_position()-nearest) < Math.abs(elevator.get_position()-person.get_destination_floor())) {
+                return this.commit_decision(nearest);
+            } else {
+                return this.commit_decision(person.get_destination_floor());
+            }
+        }
     }
     
     for(var i = 0;i < requests.length;i++) {
@@ -72,10 +93,34 @@ Elevator.prototype.decide = function() {
                 break;
             }
         }
-        if(!handled) {
+        if(!handled && Math.abs(elevator.get_position()-requests[i]) < Math.floor(num_floors / 2)) {
             return this.commit_decision(requests[i]);
         }
     }
 
     return this.commit_decision(Math.floor(num_floors / 2));
+    
+};
+
+function closestPeople(num, array) {
+    var close = array[0].get_destination_floor();
+    var diff = Math.abs(num-close);
+    for(var i = 0; i < array.length; i++) {
+        var new_diff = Math.abs(num-array[i].get_destination_floor());
+        if(new_diff < diff) {
+            diff = new_diff;
+            close = array[i].get_destination_floor();
+        }
+    }
+    return close;
+};
+
+function numDirection(direction, people) {
+    var nb = 0;
+    for(var i = 0; i < people.length; i++) {
+        if(people[i].get_direction() == direction) {
+            nb++;
+        }
+    }
+    return nb;
 };

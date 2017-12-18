@@ -1,9 +1,10 @@
-Elevator Simulation Problem  
-  
-Edit only the function definition of Elevator.prototype.decide() in myelevator.js.  
-That function is called when elevator needs to decide which floor it needs to go to.  
-Try to:  
-1. minimize total_people_wait_time_in_elevator  
-2. minimize total_people_wait_time_out_elevator  
-3. minimize total_elevator_traveled_distance  
-4. maximize total_delivered_people  
+# Elevator Problem
+The most optimum decision code for elevator inteligence (so far).
+
+You can find original problem [here](https://github.com/shendykurnia/elevator)
+
+## Pseudocode
+1. If there are people inside, get the nearest destination floor from people inside and direction that most people inside wanted is TOP priority
+2. If not, pick the nearest request
+3. While delivering people, pick a request from the same floor with destination
+4. While idle, set elevator stay on the middle of building
